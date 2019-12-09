@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+						http://www.springframework.org/schema/aop
+						http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+						http://www.springframework.org/schema/context
+						http://www.springframework.org/schema/context/spring-context-3.2.xsd
+						http://www.springframework.org/schema/mvc
+						http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd">
+<!-- 第一步：配置Spring MVC -->
+	<!-- 1、配置控制器Controller -->
+		<!-- 使用注解方式配置控制器-->
+	<context:component-scan base-package="cn.appsys.controller"></context:component-scan>
+<!-- 第二步：mvc -->
+	<mvc:annotation-driven>
+		<mvc:message-converters>
+			<!-- 1、json解决中文乱码 -->
+			<bean class="org.springframework.http.converter.StringHttpMessageConverter">
+				<!-- 配置返回数据类型以及支持的编码格式 -->
+				<property name="supportedMediaTypes">
+					<list>
+						<value>application/json;charset=utf-8</value>
+					</list>
+				</property>
+			</bean>
+			<!-- 2、配置json日期格式转换器 -->
+			<bean class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+				<!-- 配置文件支持 -->
+				
+				<property name="supportedMediaTypes">
+					<list>
+						<value>text/html;charset=utf-8</value>
+						<value>application/json</value>
+					</list>
+				</property>
+				<property name="features">
+					<list>
+						<!-- 输出date日期转化器 -->
+						<value>WriteDateUseDateFormat</value>
+					</list>
+				</property>
+			</bean>
+		</mvc:message-converters>
+	</mvc:annotation-driven>
+	
+	
+<!-- 第三步：配置多视图解析器 -->
+	<bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+		<!-- 配置支持参数传递 -->
+		<property name="favorParameter" value="true"></property>
+		<property name="defaultContentType" value="text/html"></property>
+		<!-- 配置支持的视图类型 -->
+		<property name="mediaTypes">
+			<map>
+				<entry key="html" value="text/html;charset=utf-8"></entry>
+				<entry key="json" value="application/json;charset=utf-8"></entry>
+				<entry key="xml" value="application/xml;charset=utf-8"></entry>
+			</map>
+		</property>
+		
+		
+		<property name="viewResolvers">
+			<list>
+				<!-- 配置解析jsp的视图解析器 -->
+				<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+					<!-- 配置支持参数传递 -->
+					<property name="prefix" value="/WEB-INF/jsp/"></property>
+					<!-- 配置页面类型 -->
+					<property name="suffix" value=".jsp"></property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+	
+<!-- 第四步：配置静态资源文件，使其可以访问
+		mapping:配置静态资源访问路径
+		location ： 配置静态资源在项目中的实际路径 -->
+	<mvc:resources location="/statics/images/" mapping="/statics/images/**"/>
+	<mvc:resources location="/statics/css/" mapping="/statics/css/**"/>
+	<mvc:resources location="/statics/js/" mapping="/statics/js/**"/>
+	<mvc:resources location="/statics/fonts/" mapping="/statics/fonts/**"/>
+	<mvc:resources location="/statics/localcss/" mapping="/statics/localcss/**"/>
+	<mvc:resources location="/statics/localjs/" mapping="/statics/localjs/**"/>
+	<mvc:resources location="/statics/uploadfiles/" mapping="/statics/uploadfiles/**"/>
+	<mvc:resources location="/statics/upload/" mapping="/statics/upload/**"/>
+	<mvc:resources location="/upload/" mapping="/upload/**"/>
+<!-- 第五步：配置全局异常处理，当出现指定错误时，全局异常处理生效 -->
+	<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+			<!-- 配置需要处理的异常 -->
+			<property name="exceptionMappings">
+				<props>
+					<!-- 可以配置多个异常，key:异常权限定类名，文本内容：显示异常的页面 -->
+					<prop key="java.lang.Exception">error</prop>
+				</props>
+			</property>
+	</bean>
+	
+<!-- 第六步：配置上传文件 -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+			<!-- 上传文件大小 -->
+		<property name="maxUploadSize" value="5000000"></property>
+			<!-- 设置编码格式，和项目编码一致 -->
+		<property name="defaultEncoding" value="UTF-8"></property>
+		
+	</bean>
+	
+
+</beans>		
+
+
+
+
+
+
+
+
+
+
